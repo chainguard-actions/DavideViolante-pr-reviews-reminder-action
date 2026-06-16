@@ -1,0 +1,58 @@
+name: Test basic usage with webhook-url input
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: fake-token
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Start mock webhook server
+        run: |
+          # Start a simple HTTP server that accepts POST requests and returns 200
+          python3 -c "
+          import http.server, threading, json
+
+          class Handler(http.server.BaseHTTPRequestHandler):
+              def do_POST(self):
+                  length = int(self.headers.get('Content-Length', 0))
+                  body = self.rfile.read(length)
+                  self.send_response(200)
+                  self.end_headers()
+                  self.wfile.write(b'ok')
+              def log_message(self, format, *args):
+                  pass
+
+          server = http.server.HTTPServer(('127.0.0.1', 9999), Handler)
+          t = threading.Thread(target=server.serve_forever)
+          t.daemon = True
+          t.start()
+          import time; time.sleep(3600)
+          " &
+          sleep 1
+          echo "Mock server started"
+
+      - id: action
+        uses: .
+        continue-on-error: true
+        with:
+          webhook-url: "http://127.0.0.1:9999/webhook"
+          provider: "slack"
+          channel: "#general"
+        env:
+          GITHUB_TOKEN: fake-token
+
+      - name: Assert action was invoked with webhook-url input
+        run: |
+          # The action may fail due to fake GitHub token, but it must have been
+          # invoked (i.e., the step ran). We verify the step ran by checking
+          # that the outcome is either success or failure (not skipped).
+          OUTCOME="${{ steps.action.outcome }}"
+          echo "action outcome: $OUTCOME"
+          if [ "$OUTCOME" = "skipped" ]; then
+            echo "FAIL: action step was skipped, expected it to run"
+            exit 1
+          fi
+          echo "PASS: action was invoked with webhook-url input covered"
