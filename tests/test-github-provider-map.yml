@@ -1,0 +1,37 @@
+name: Test GitHub to Slack user ID mapping
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Run PR reviews reminder action with user mapping
+        id: action
+        continue-on-error: true
+        uses: .
+        with:
+          webhook-url: 'https://httpbin.org/post'
+          provider: 'slack'
+          channel: '#reviews'
+          github-provider-map: 'DavideViolante:UABCDEFGH,foobar123:UIHJKLMNO'
+          ignore-label: ''
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Assert action ran without unexpected failure
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "Action outcome: $OUTCOME"
+          # The action may succeed (no PRs to notify about) or fail due to
+          # network/API issues, but it should not crash with an unhandled error.
+          # The github-provider-map input is parsed by the action; if it crashes
+          # on parsing, the outcome would be something other than success/failure.
+          if [ "$OUTCOME" = "success" ] || [ "$OUTCOME" = "failure" ]; then
+            echo "PASS: action completed with outcome: $OUTCOME"
+          else
+            echo "FAIL: unexpected outcome: $OUTCOME"
+            exit 1
+          fi

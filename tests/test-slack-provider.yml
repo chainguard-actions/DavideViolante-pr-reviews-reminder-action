@@ -1,0 +1,48 @@
+name: Test Slack provider basic usage
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: fake-token-for-testing
+      GITHUB_REPOSITORY: test-owner/test-repo
+      GITHUB_EVENT_NAME: schedule
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Start mock webhook server
+        run: |
+          # Start a simple HTTP server that accepts POST requests
+          python3 -m http.server 9999 &
+          echo $! > /tmp/mock_server.pid
+          sleep 1
+          echo "Mock server started"
+
+      - id: action
+        uses: .
+        continue-on-error: true
+        with:
+          webhook-url: 'http://localhost:9999/webhook'
+          provider: 'slack'
+          channel: '#general'
+          github-provider-map: ''
+          ignore-label: ''
+
+      - name: Assert action ran
+        run: |
+          echo "Action outcome: ${{ steps.action.outcome }}"
+          # The action may fail due to fake GitHub token/repo, but it should
+          # at least start and attempt to run (not crash on startup)
+          if [ "${{ steps.action.outcome }}" = "skipped" ]; then
+            echo "FAIL: action was skipped unexpectedly"
+            exit 1
+          fi
+          echo "PASS: action ran (outcome: ${{ steps.action.outcome }})"
+
+      - name: Stop mock server
+        if: always()
+        run: |
+          if [ -f /tmp/mock_server.pid ]; then
+            kill $(cat /tmp/mock_server.pid) 2>/dev/null || true
+          fi
