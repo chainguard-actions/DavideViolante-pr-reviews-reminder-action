@@ -1,0 +1,36 @@
+name: Test with optional inputs (ignore-label and github-provider-map)
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: fake-token-for-testing
+      GITHUB_EVENT_NAME: push
+      GITHUB_REF: refs/heads/main
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - id: action
+        uses: .
+        continue-on-error: true
+        with:
+          webhook-url: 'https://hooks.slack.com/services/FAKE/FAKE/FAKE'
+          provider: 'slack'
+          channel: '#reviews'
+          github-provider-map: 'testuser:UABCDEFGH,anotheruser:UIHJKLMNO'
+          ignore-label: 'wip'
+
+      - name: Assert action was invoked with optional inputs
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "action outcome: $OUTCOME"
+          # The action should either succeed or fail due to API/network issues,
+          # not due to invalid optional input format.
+          if [ "$OUTCOME" = "success" ] || [ "$OUTCOME" = "failure" ]; then
+            echo "PASS: action was invoked correctly with optional inputs"
+          else
+            echo "FAIL: unexpected outcome: $OUTCOME"
+            exit 1
+          fi

@@ -1,0 +1,18 @@
+name: PRs reviews reminder (self testing for MS Teams)
+
+on: ["push", "pull_request"]
+
+permissions: {}
+
+jobs:
+  pr-reviews-reminder:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: davideviolante/pr-reviews-reminder-action@8966f84f476a05de86089b98b361d9c5114bc1c0 # master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        webhook-url: ${{ secrets.MSTEAMS_WEBHOOK_URL }} # Required
+        provider: 'msteams' # Required (slack or msteams)
+        channel: '' # Optional, eg: #general
+        github-provider-map: 'DavideViolante:admin@DavideViolante.onmicrosoft.com' # Optional, eg: "DavideViolante:UEABCDEFG,foobar:UAABCDEFG"

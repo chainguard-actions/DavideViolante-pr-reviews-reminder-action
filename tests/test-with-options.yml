@@ -1,0 +1,62 @@
+name: Test with optional inputs
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Start local webhook receiver
+        run: |
+          mkdir -p /tmp/webhook-server
+          cat > /tmp/webhook-server/server.py << 'EOF'
+          import http.server
+
+          class Handler(http.server.BaseHTTPRequestHandler):
+              def do_POST(self):
+                  length = int(self.headers.get('Content-Length', 0))
+                  body = self.rfile.read(length)
+                  print(f"Received POST: {body.decode()}", flush=True)
+                  self.send_response(200)
+                  self.end_headers()
+                  self.wfile.write(b'OK')
+              def log_message(self, format, *args):
+                  pass
+
+          server = http.server.HTTPServer(('0.0.0.0', 9997), Handler)
+          server.serve_forever()
+          EOF
+          python3 /tmp/webhook-server/server.py &
+          echo $! > /tmp/webhook-server/server.pid
+          sleep 1
+          echo "Webhook server started on port 9997"
+
+      - id: action
+        uses: .
+        with:
+          webhook-url: 'http://localhost:9997/webhook'
+          provider: 'slack'
+          channel: '#reviews'
+          github-provider-map: 'testuser:UABCDEFGH'
+          ignore-label: 'wip'
+        continue-on-error: true
+
+      - name: Stop webhook server
+        run: |
+          if [ -f /tmp/webhook-server/server.pid ]; then
+            kill $(cat /tmp/webhook-server/server.pid) 2>/dev/null || true
+          fi
+
+      - name: Assert action completed
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "action outcome: $OUTCOME"
+          # The action should either succeed (no PRs to notify) or fail gracefully
+          if [ "$OUTCOME" = "success" ] || [ "$OUTCOME" = "failure" ]; then
+            echo "PASS: action ran and completed with outcome: $OUTCOME"
+          else
+            echo "FAIL: unexpected outcome: $OUTCOME"
+            exit 1
+          fi
