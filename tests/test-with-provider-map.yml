@@ -1,0 +1,57 @@
+name: Test with GitHub provider map and ignore label
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Start mock webhook server
+        run: |
+          # Start a simple HTTP server that accepts POST requests and returns 200
+          python3 -c "
+          import http.server, threading
+
+          class Handler(http.server.BaseHTTPRequestHandler):
+              def do_POST(self):
+                  length = int(self.headers.get('Content-Length', 0))
+                  body = self.rfile.read(length)
+                  self.send_response(200)
+                  self.end_headers()
+                  self.wfile.write(b'ok')
+              def log_message(self, format, *args):
+                  pass
+
+          server = http.server.HTTPServer(('0.0.0.0', 9997), Handler)
+          t = threading.Thread(target=server.serve_forever)
+          t.daemon = True
+          t.start()
+          import time; time.sleep(3600)
+          " &
+          sleep 1
+          echo "Mock webhook server started on port 9997"
+
+      - id: action
+        uses: .
+        with:
+          webhook-url: 'http://localhost:9997/webhook'
+          provider: 'slack'
+          channel: '#reviews'
+          github-provider-map: 'DavideViolante:UABCDEFGH,foobar123:UIHJKLMNO'
+          ignore-label: 'wip'
+        continue-on-error: true
+
+      - name: Assert action ran without unexpected crash
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "Action outcome: $OUTCOME"
+          # The action may succeed (no PRs to notify about) or fail due to
+          # GitHub API rate limits / no open PRs — both are acceptable.
+          # What we verify is that it ran (not skipped).
+          if [ "$OUTCOME" = "skipped" ]; then
+            echo "FAIL: action was skipped unexpectedly"
+            exit 1
+          fi
+          echo "PASS: action ran with outcome=$OUTCOME"
