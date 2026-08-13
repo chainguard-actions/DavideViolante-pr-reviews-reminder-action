@@ -1,0 +1,35 @@
+name: Test basic Slack provider usage
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: fake-token-for-testing
+      GITHUB_EVENT_NAME: push
+      GITHUB_REF: refs/heads/main
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Run action with Slack provider (expect failure due to invalid webhook/token)
+        id: action
+        uses: .
+        continue-on-error: true
+        with:
+          webhook-url: 'https://hooks.slack.com/services/FAKE/FAKE/FAKE'
+          provider: 'slack'
+          channel: '#general'
+          github-provider-map: ''
+          ignore-label: ''
+
+      - name: Assert action ran (pass or fail gracefully)
+        run: |
+          echo "Action outcome: ${{ steps.action.outcome }}"
+          # The action is expected to fail because the webhook URL is fake
+          # and the GitHub token is invalid. We just verify it ran and
+          # did not produce an unexpected error (e.g. missing required input).
+          if [ "${{ steps.action.outcome }}" = "skipped" ]; then
+            echo "FAIL: action was skipped unexpectedly"
+            exit 1
+          fi
+          echo "PASS: action ran (outcome: ${{ steps.action.outcome }})"

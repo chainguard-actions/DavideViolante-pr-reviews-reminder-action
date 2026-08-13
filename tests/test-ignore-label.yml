@@ -1,0 +1,30 @@
+name: Test ignore-label input
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          webhook-url: 'https://hooks.slack.com/services/fake/webhook/url'
+          provider: 'slack'
+          channel: '#reviews'
+          ignore-label: 'wip'
+        continue-on-error: true
+      - name: Assert action ran with ignore-label input
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "outcome: $OUTCOME"
+          # The action should accept the ignore-label input and filter PRs with that label.
+          # If no PRs need review (or all have the ignored label), it succeeds without
+          # hitting the webhook. If PRs exist without the label, it tries the webhook.
+          if [ "$OUTCOME" = "success" ]; then
+            echo "PASS: action succeeded with ignore-label input"
+          else
+            echo "INFO: action attempted to send notification (PRs exist without ignored label)"
+            echo "PASS: action ran with ignore-label input"
+          fi

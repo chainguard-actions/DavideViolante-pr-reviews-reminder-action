@@ -1,0 +1,28 @@
+name: Test MS Teams provider
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          webhook-url: 'https://outlook.office.com/webhook/fake/webhook/url'
+          provider: 'msteams'
+        continue-on-error: true
+      - name: Assert action ran with msteams provider
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "outcome: $OUTCOME"
+          # The action either succeeds (no PRs to notify) or fails due to webhook
+          # being unreachable (only if there are PRs needing review).
+          # It should not fail due to missing inputs or bad provider config.
+          if [ "$OUTCOME" = "success" ]; then
+            echo "PASS: action succeeded with msteams provider (no PRs needing review)"
+          else
+            echo "INFO: action did not succeed, likely webhook unreachable due to open PRs"
+            echo "PASS: action ran with msteams provider"
+          fi

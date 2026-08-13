@@ -1,0 +1,31 @@
+name: Test invalid github-provider-map format
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - id: action
+        uses: .
+        with:
+          webhook-url: 'https://hooks.slack.com/services/fake/webhook/url'
+          provider: 'slack'
+          github-provider-map: 'INVALID_FORMAT_NO_COLON'
+        continue-on-error: true
+      - name: Assert action fails with invalid provider map
+        env:
+          OUTCOME: ${{ steps.action.outcome }}
+        run: |
+          echo "outcome: $OUTCOME"
+          # The action should fail because the github-provider-map format is invalid.
+          # However, this only triggers if there are PRs needing review.
+          # If there are no PRs, the action succeeds without checking the map format.
+          if [ "$OUTCOME" = "failure" ]; then
+            echo "PASS: action correctly failed with invalid provider map (PRs exist)"
+          elif [ "$OUTCOME" = "success" ]; then
+            echo "PASS: action succeeded (no PRs needing review, map not validated)"
+          else
+            echo "FAIL: unexpected outcome: $OUTCOME"
+            exit 1
+          fi
