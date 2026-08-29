@@ -1,18 +1,79 @@
-# DavideViolante/pr-reviews-reminder-action
+# Pull Request reviews reminder action
+[![](https://github.com/davideviolante/pr-reviews-reminder-action/workflows/Node.js%20CI/badge.svg)](https://github.com/DavideViolante/pr-reviews-reminder-action/actions?query=workflow%3A%22Node.js+CI%22) [![Coverage Status](https://coveralls.io/repos/github/DavideViolante/pr-reviews-reminder-action/badge.svg?branch=master)](https://coveralls.io/github/DavideViolante/pr-reviews-reminder-action?branch=master) [![Maintainability](https://api.codeclimate.com/v1/badges/60f9b3a6b4177a0bfe77/maintainability)](https://codeclimate.com/github/DavideViolante/pr-reviews-reminder-action/maintainability) [![Donate](https://img.shields.io/badge/paypal-donate-179BD7.svg)](https://www.paypal.me/dviolante)
 
-Automatically send notification for pull requests waiting for reviewers
+Action to send Slack/Rocket/Teams notifications when there are pull requests pending for reviews.
 
-Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at [https://github.com/DavideViolante/pr-reviews-reminder-action](https://github.com/DavideViolante/pr-reviews-reminder-action).
+## Preview
+![Preview](https://raw.githubusercontent.com/DavideViolante/pr-reviews-reminder-action/master/preview.png "Preview")
 
-## Versions
+## Inputs
 
-| Version | Tag | Upstream commit |
-|---------|-----|-----------------|
-| v2.4.0 | [`v2.4.0`](https://github.com/chainguard-actions/DavideViolante-pr-reviews-reminder-action/tree/v2.4.0) | [`a994435`](https://github.com/DavideViolante/pr-reviews-reminder-action/commit/a994435e7d631ab91813302dc5f2f4fb86fa8810) |
-| v2.5.0 | [`v2.5.0`](https://github.com/chainguard-actions/DavideViolante-pr-reviews-reminder-action/tree/v2.5.0) | [`738a8b8`](https://github.com/DavideViolante/pr-reviews-reminder-action/commit/738a8b889d09282bc28009e40c85081308c4ee6a) |
-| v2.6.0 | [`v2.6.0`](https://github.com/chainguard-actions/DavideViolante-pr-reviews-reminder-action/tree/v2.6.0) | [`18f0fec`](https://github.com/DavideViolante/pr-reviews-reminder-action/commit/18f0fec89fc4a3d2cf679206950b347aedeb9a61) |
-| v2.7.0 | [`v2.7.0`](https://github.com/chainguard-actions/DavideViolante-pr-reviews-reminder-action/tree/v2.7.0) | [`b5a3c7d`](https://github.com/DavideViolante/pr-reviews-reminder-action/commit/b5a3c7d60b51fd1e9a73e0f235c24236a12fdf0d) |
-| v2.8.0 | [`v2.8.0`](https://github.com/chainguard-actions/DavideViolante-pr-reviews-reminder-action/tree/v2.8.0) | [`d007374`](https://github.com/DavideViolante/pr-reviews-reminder-action/commit/d007374bcd880fffdae9f8aef3407f720a64cca8) |
+### webhook-url
+
+The webhook URL (required). More info [here (Slack)](https://api.slack.com/messaging/webhooks) and [here (Teams)](https://docs.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/how-to/connectors-using#setting-up-a-custom-incoming-webhook).
+
+### provider
+
+Chat provider, `slack`, `rocket` or `msteams` (required). Default `slack`.
+
+### channel
+
+The channel name, eg: `#general` (optional).
+
+### github-provider-map
+
+A string like this `"githubusername1:provideruserid1,githubusername2:provideruserid2,..."` to define the mapping between GitHub usernames and Slack/MS Teams user IDs (optional). Example: `"DavideViolante:UEABCDEFG,foobar:UAABCDEFG"`. Note: it's case sensitive! [How to find Slack User IDs](https://www.google.com/search?q=find+slack+user+id).
+
+For MS Teams, the provider user ID can be an [MS teams user ID or a UPN](https://www.google.com/search?q=find+%22microsoft+teams%22+userprincipalname+-office) Example: `"DavideViolante:admin@DavideViolante.onmicrosoft.com',foobar:foobar@foobar.onmicrosoft.com"`.
+
+Another hacky way (no code) to find the MS Teams UPN is the following: open MS Teams on your browser, click the 3 dots near your Team name, click Add member, open Google Chrome console Network tab Fetch/XHR category, type the email address, look for "searchV2" in the Network tab, click Response tab.
+
+### ignore-label
+
+Ignore Pull Requests with that label(s), eg: `no-reminder` or `no-reminder,ignore me` (optional).
+
+### message-template
+
+The message template to render (optional). Default: `Hey {mention}, the PR "{title}" is waiting for your review: {url}`.
+
+### aggregate-per-mention
+
+Group the message rows by mention, instead of one row per Pull Request (optional). Default: `false`.
+
+When `true`, all the Pull Requests waiting for review from the same person/team are grouped under a single header line: `{mention} ({amount of PRs to review} pull requests):`, followed by one row per Pull Request using `message-template`.
+
+## Example usage
+
+```yaml
+name: PRs reviews reminder
+
+on:
+  schedule:
+    # Every weekday every 2 hours during working hours, send notification
+    - cron: "0 8-17/2 * * 1-5"
+
+jobs:
+  pr-reviews-reminder:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: davideviolante/pr-reviews-reminder-action@v2.9.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        webhook-url: '' # Required
+        provider: '' # Required (slack, rocket or msteams)
+        channel: '' # Optional, eg: #general
+        github-provider-map: '' # Optional, eg: DavideViolante:UEABCDEFG,foobar:UAABCDEFG
+        ignore-label: '' # Optional, eg: no-reminder,ignore me
+        message-template: '' # Optional, eg: Hey {mention}, the PR "{title}" is waiting for your review: {url}
+        aggregate-per-mention: false # Optional, eg: true or false (default false)
+```
+
+## Bug or feedback?
+Please open an issue.
+
+## Author
+- [Davide Violante](https://github.com/DavideViolante)
 
 ## Privacy
 
