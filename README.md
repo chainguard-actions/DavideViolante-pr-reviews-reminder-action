@@ -6,14 +6,14 @@ Hardened by [Chainguard](https://www.chainguard.dev) from the upstream action at
 
 ## Versions
 
-| Version | Tag | Upstream commit |
-|---------|-----|-----------------|
-| v2.4.0 | [`v2.4.0`](https://github.com/chainguard-actions/DavideViolante-pr-reviews-reminder-action/tree/v2.4.0) | [`a994435`](https://github.com/DavideViolante/pr-reviews-reminder-action/commit/a994435e7d631ab91813302dc5f2f4fb86fa8810) |
-| v2.5.0 | [`v2.5.0`](https://github.com/chainguard-actions/DavideViolante-pr-reviews-reminder-action/tree/v2.5.0) | [`738a8b8`](https://github.com/DavideViolante/pr-reviews-reminder-action/commit/738a8b889d09282bc28009e40c85081308c4ee6a) |
-| v2.6.0 | [`v2.6.0`](https://github.com/chainguard-actions/DavideViolante-pr-reviews-reminder-action/tree/v2.6.0) | [`18f0fec`](https://github.com/DavideViolante/pr-reviews-reminder-action/commit/18f0fec89fc4a3d2cf679206950b347aedeb9a61) |
-| v2.7.0 | [`v2.7.0`](https://github.com/chainguard-actions/DavideViolante-pr-reviews-reminder-action/tree/v2.7.0) | [`b5a3c7d`](https://github.com/DavideViolante/pr-reviews-reminder-action/commit/b5a3c7d60b51fd1e9a73e0f235c24236a12fdf0d) |
-| v2.8.0 | [`v2.8.0`](https://github.com/chainguard-actions/DavideViolante-pr-reviews-reminder-action/tree/v2.8.0) | [`d007374`](https://github.com/DavideViolante/pr-reviews-reminder-action/commit/d007374bcd880fffdae9f8aef3407f720a64cca8) |
-| v2.9.0 | [`v2.9.0`](https://github.com/chainguard-actions/DavideViolante-pr-reviews-reminder-action/tree/v2.9.0) | [`b325259`](https://github.com/DavideViolante/pr-reviews-reminder-action/commit/b32525931a7fbbbd98be36c4e56a7c2d73e1ec6e) |
+| Version | Tag | Upstream commit | Hardening report |
+|---------|-----|-----------------|------------------|
+| v2.4.0 | [`v2.4.0`](https://github.com/chainguard-actions/DavideViolante-pr-reviews-reminder-action/tree/v2.4.0) | [`a994435`](https://github.com/DavideViolante/pr-reviews-reminder-action/commit/a994435e7d631ab91813302dc5f2f4fb86fa8810) | [`HARDENING.md`](https://github.com/chainguard-actions/DavideViolante-pr-reviews-reminder-action/blob/v2.4.0/HARDENING.md) |
+| v2.5.0 | [`v2.5.0`](https://github.com/chainguard-actions/DavideViolante-pr-reviews-reminder-action/tree/v2.5.0) | [`738a8b8`](https://github.com/DavideViolante/pr-reviews-reminder-action/commit/738a8b889d09282bc28009e40c85081308c4ee6a) | [`HARDENING.md`](https://github.com/chainguard-actions/DavideViolante-pr-reviews-reminder-action/blob/v2.5.0/HARDENING.md) |
+| v2.6.0 | [`v2.6.0`](https://github.com/chainguard-actions/DavideViolante-pr-reviews-reminder-action/tree/v2.6.0) | [`18f0fec`](https://github.com/DavideViolante/pr-reviews-reminder-action/commit/18f0fec89fc4a3d2cf679206950b347aedeb9a61) | [`HARDENING.md`](https://github.com/chainguard-actions/DavideViolante-pr-reviews-reminder-action/blob/v2.6.0/HARDENING.md) |
+| v2.7.0 | [`v2.7.0`](https://github.com/chainguard-actions/DavideViolante-pr-reviews-reminder-action/tree/v2.7.0) | [`b5a3c7d`](https://github.com/DavideViolante/pr-reviews-reminder-action/commit/b5a3c7d60b51fd1e9a73e0f235c24236a12fdf0d) | [`HARDENING.md`](https://github.com/chainguard-actions/DavideViolante-pr-reviews-reminder-action/blob/v2.7.0/HARDENING.md) |
+| v2.8.0 | [`v2.8.0`](https://github.com/chainguard-actions/DavideViolante-pr-reviews-reminder-action/tree/v2.8.0) | [`d007374`](https://github.com/DavideViolante/pr-reviews-reminder-action/commit/d007374bcd880fffdae9f8aef3407f720a64cca8) | [`HARDENING.md`](https://github.com/chainguard-actions/DavideViolante-pr-reviews-reminder-action/blob/v2.8.0/HARDENING.md) |
+| v2.9.0 | [`v2.9.0`](https://github.com/chainguard-actions/DavideViolante-pr-reviews-reminder-action/tree/v2.9.0) | [`b325259`](https://github.com/DavideViolante/pr-reviews-reminder-action/commit/b32525931a7fbbbd98be36c4e56a7c2d73e1ec6e) | [`HARDENING.md`](https://github.com/chainguard-actions/DavideViolante-pr-reviews-reminder-action/blob/v2.9.0/HARDENING.md) |
 
 ## Privacy
 
