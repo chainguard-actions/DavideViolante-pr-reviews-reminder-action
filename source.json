@@ -4,8 +4,13 @@
   "version": "v2.7.0",
   "commit_sha": "b5a3c7d60b51fd1e9a73e0f235c24236a12fdf0d",
   "url": "https://github.com/DavideViolante/pr-reviews-reminder-action",
-  "policy_sha": "d636be7e43ef829af6e853da6b3c7566db9f72fe",
+  "policy_sha": "374911c4be584df24e6da57af2d990570ef0f859",
   "test_policy_sha": "843adf9e4b8f85d0c08b27b9d0b09dd094b54702",
   "test_agent_version": "2",
-  "harden_agent_version": "2"
+  "harden_agent_version": "2",
+  "dist_artifact": {
+    "gcs_uri": "gs://patch-actions-node-artifacts/dist-artifacts/DavideViolante/pr-reviews-reminder-action/v2.7.0/sha256-88071f5343514428fe2ec69989ab155d25d3a49607c341918b38808737f5636b.tar.gz",
+    "sha256": "88071f5343514428fe2ec69989ab155d25d3a49607c341918b38808737f5636b",
+    "size_bytes": 99326
+  }
 }
